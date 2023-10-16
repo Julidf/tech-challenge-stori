@@ -1,0 +1,21 @@
+.App {
+  text-align: center;
+}
+
+.landing-container {
+  display: flex;
+}
+
+/* #109CB3 */
+
+.btn {
+  border-radius: 5px;
+  border: 1px solid white;
+  padding: 3px;
+  background-color: rgba(66, 129, 108, 0.5);
+  color: white;
+
+  &:hover {
+    cursor: pointer
+  }
+}

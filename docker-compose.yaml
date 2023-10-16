@@ -1,0 +1,32 @@
+version: '3.8'
+services: 
+  react-frontend:
+    build: ./frontend-stori
+    ports:
+      - "3000:3000"
+    container_name: react-stori
+    volumes:
+      - ./frontend-stori:/usr/src/app
+
+  nodejs-server:
+    build: ./backend-stori
+    ports:
+      - '8080:8080'
+    container_name: node-stori
+    volumes:
+      - ./backend-stori:/usr/src/api
+    depends_on:
+      - mongodb-stori
+
+  mongodb-stori:
+    image: mongo:latest
+    ports: 
+      - '27017:27017'
+    container_name: mongodb-stori
+    volumes:
+      - mongodb-stori:/data/db
+
+volumes:
+  frontend-stori:
+  backend-stori:
+  mongodb-stori:

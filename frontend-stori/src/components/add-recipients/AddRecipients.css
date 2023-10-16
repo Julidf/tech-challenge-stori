@@ -1,0 +1,50 @@
+.add-recipient-container {
+    background-color: rgba(127, 255, 212, 0.158);
+    border: 1px solid white;
+    border-radius: 5px;
+    width: 67%;
+    height: 32vh;
+    margin: 3rem auto;
+}
+
+.add-recipient {
+
+    & h2 {
+        margin-block: 0.5rem;
+    }
+}
+  
+.add-recipient-button {
+    margin-left: 5px;
+    width: 2.5rem;
+}
+
+.add-recipient-form {
+
+    & textarea {
+        width: 20rem;
+        border-radius: 6px;
+        border: 1px solid white;
+        color: white;
+        background: none;
+        padding: 8px;
+
+        min-height: 10px; /* Altura mínima inicial */
+        max-height: 800px; /* Altura máxima antes de desplazamiento */
+        resize: none;
+    }
+
+    & textarea:focus {
+        outline-color: white;
+    }
+
+}
+
+textarea::-webkit-scrollbar {
+    width: 10px;
+}
+  
+textarea::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 6px;
+}
