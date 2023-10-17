@@ -2,119 +2,109 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 const recipientSchema = require("../models/recipient");
+const { validateEmails } = require("../services/middleware");
+const { sendEmail } = require("../services/emailService");
+const { Appurl } = require("../services/constants");
 
-/*
-*   
-*
-*/
+/* Endpoint to add recipients to the database.
+ * 
+ * Receives:
+ * - Body: emailList (an array of email addresses to add as recipients).
+ * 
+ * Returns:
+ * - JSON response with an array of recipients that were successfully added to the database.
+ * - Status 500 in case of an error, along with an error message.
+ */
 router.post("/add-recipient", async (request, response) => {
     try {
-        const email = request.body.email;
-        //Query if the recipient exists in the DB
-        const existRecipient = await recipientSchema.find({ email: { $eq: email } })
-        //If there is a recipient we just return that item and don't save it into the DB
-        if (existRecipient.length > 0) {
-            return response.json(existRecipient[0])
-        }
+        const emailList = request.body.emailList;
 
-        //If the recipient doesn't exist we insert it into the DB
-        const recipient = new recipientSchema({ email })
-        const data = await recipient.save()
-        console.log("Recipient added!")
-        response.json(data)
+        //Validate that there are no duplicate email addresses using a Set
+        const uniqueEmails = new Set(emailList);
+        //Convert the set back into an array
+        const uniqueEmailsNotValidated = Array.from(uniqueEmails);
+        //Validating only unique emails
+        const validEmails = validateEmails(uniqueEmailsNotValidated);
+
+        console.log(validEmails)
+
+        let recipientsAdded = []
+        await Promise.all(validEmails.map(async (email) => {     
+            //Query if the recipient exists in the DB
+            const existRecipient = await recipientSchema.find({ email: { $eq: email } })
+
+            //If the recipient doesn't exist we save it into the DB
+            if (existRecipient.length === 0) {
+                const recipient = new recipientSchema({ email })
+                recipientsAdded.push(await recipient.save())
+                console.log("Recipient added!")
+            }
+        }));
+        console.log("Lista de recipients: ", recipientsAdded)
+        response.json(recipientsAdded)
     } catch (error) {
         console.error(error)
         response.status(500).json({ body: "Error trying to insert a recipient: " + error.message})
     }
 })
 
-/*
-*   
-*
-*/
+/* Endpoint to send a newsletter to recipients.
+ * 
+ * Receives:
+ * - Body: newsletter (base64 encoded newsletter content) and filename (the name of the file).
+ * 
+ * Returns:
+ * - Status 200 if the operation is successful.
+ * - JSON response with a preview of the first email sent, including a link to the preview.
+ * - Status 500 in case of an error, along with an error message.
+ */
 router.post("/submit-newsletter", async (request, response) => {
     try {
         const newsletter = request.body.newsletter;
         const filename = request.body.filename;
 
-        //fetching the recipients list and building the list of emails
-        const recipients = await getAllRecipients();
-        const recipientsEmails = recipients.map((recipient) =>  
-            recipient.email
-        );
+        if(!newsletter) {
+            throw new Error("There isn't a newsletter to send")
+        }
 
-        //Decoding the base64 encoded file
-        const decodedString = Buffer.from(newsletter.split(',')[1], 'base64');
+        const newsletterDecoded = Buffer.from(newsletter.split(',')[1], 'base64'); //Decoding the base64 encoded file
+
+        //fetching the recipients list
+        const recipientList = await getAllRecipients();
         
-        //Using Ethereal, a fake SMTP service with a fake account
-        const transporter = nodemailer.createTransport({
-            host: 'smtp.ethereal.email',
-            port: 587,
-            // secure: "true",
-            auth: {
-                user: 'jayme.denesik@ethereal.email',
-                pass: 'MzEyymSkd5x3wUM4Xx'
-            },
-            tls: {
-                rejectUnauthorized: false
-            }
-        });
+        if (recipientList.length <= 0) {
+            throw new Error("There aren't recipients to send the email")
+        }
 
-        // //Using my secondary google account that I never use so don't worry haha
-        // const transporter = nodemailer.createTransport({
-        //     host: 'smtp.gmail.com',
-        //     port: 465,
-        //     // secure: "true",
-        //     auth: {
-        //         user: 'diazfianojulian@gmail.com',
-        //         pass: 'bfoa pmwx gdtg qioi'
-        //     },
-        //     tls: {
-        //         rejectUnauthorized: false
-        //     }
-        // });
-
-        const html = `
-            <div style="text-align: center;">
-                <div style="display: inline-block;">
-                    <h3>Enjoy the Newsletter!</h3>
-                    <p>You are receiving a <b>newsletter</b> attached to this email!</p></br>
-                    <a href="http://localhost:8080/unsubscribe/?email=juliandiazfiano@gmail.com">Click to unsuscribe<a>
-                </div>
-            </div>
-        `
-
-        //Building the email props
-        const mailOptions = {
-            from: 'Juli. <diazfianojulian@gmail.com>',
-            to: recipientsEmails,
-            subject: 'Newsletter of the day!',
-            text: 'You are receiving a Newsletter attached to this email!',
-            html: html,
-            attachments: [
-              {
-                filename: filename,
-                content: decodedString
-              },
-            ],
-        };
-
-        const mailInfo = await transporter.sendMail(mailOptions);
-        response.status(200).json({ body: nodemailer.getTestMessageUrl(mailInfo)});
+        //sending the email for each recipient on the recipient list
+        const mailInfoArray = await Promise.all(recipientList.map(async (recipient, index) => {
+            return await sendEmail(filename, newsletterDecoded, recipient);
+        }));
+          
+        response.status(200).json({ body: nodemailer.getTestMessageUrl(mailInfoArray[0])}); //returning a preview of the first email sended.
     } catch (error) {
         console.error("ERROR!", error.message)
         response.status(500).json({ body: "Error submiting the newsletter: " + error.message });
     }
 })
 
+/* Endpoint to display an unsubscribe confirmation page.
+ * 
+ * Receives:
+ * - Query parameter: id (The recipient's unique identifier for confirmation).
+ * 
+ * Returns:
+ * - HTML response with a confirmation message and a link to confirm the unsubscribe.
+ * - Status 500 in case of an error, along with an error message.
+ */
 router.get("/unsubscribe", async (request, response) => {
     try {
-        
+        const id = request.query.id;
         const html = `
             <div style="text-align: center;">
                 <div style="display: inline-block;">
                     <h1>Do you really want to unsubscribe?</h1>
-                    <button><a href="http://localhost:8080/confirm-unsubscribe/?email=juliandiazfiano@gmail.com">Click to unsubscribe</a></button>
+                    <button><a href="${Appurl}/confirm-unsubscribe/?id=${id}">Click to unsubscribe</a></button>
                 </div>
             </div>
         `;
@@ -126,6 +116,15 @@ router.get("/unsubscribe", async (request, response) => {
     }
 })
 
+/* Endpoint to confirm and process the unsubscribe request.
+ * 
+ * Receives:
+ * - Query parameter: id (The recipient's unique identifier for confirmation).
+ * 
+ * Returns:
+ * - HTML response with a confirmation message after processing the unsubscribe.
+ * - Status 500 in case of an error, along with an error message.
+ */
 router.get("/confirm-unsubscribe", async (request, response) => {
     const html = `
         <div style="text-align: center;">
@@ -135,8 +134,9 @@ router.get("/confirm-unsubscribe", async (request, response) => {
         </div>
     `;
     try {
-        const email = request.query.email;
-        recipientSchema.deleteOne({ email: email }).then(() => {
+        const id = request.query.id;
+        console.log(id)
+        recipientSchema.deleteOne({ _id: id }).then(() => {
             response.send(html);
         })
     } catch (error) {
@@ -145,10 +145,7 @@ router.get("/confirm-unsubscribe", async (request, response) => {
     }
 })
 
-/*
-*   
-*
-*/
+// Fetching all the recipients from the Database
 const getAllRecipients = async () => {
     try {
         const recipients = await recipientSchema.find();

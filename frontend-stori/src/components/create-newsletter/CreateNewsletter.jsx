@@ -36,17 +36,18 @@ const CreateNewsletter = () => {
     });
 
     const submitNewsletter = () => {
-        if (newsletterData) {
+        //Validating that there is a newsletter (file) uploaded
+        if (Object.keys(newsletterData).length > 0) {
             setSendingNewsletter(true)
             //Sending the file name with its path and a base 64 enconded String to the backend as the newletter (It will need to be decoded)
             const body = newsletterData;
             console.log(body)
 
             postNewsletter(body).then((response) => {
-                setNewsletterData()
+                setNewsletterData({})
                 console.log(response)
                 alert(`Newsletter successfully sent!, you can see the email on this link: ${response.body}`);
-                // window.open(response.body, '_blank');
+                window.open(response.body, '_blank');
             })
             .catch((error) => {
                 console.error(error)
@@ -62,24 +63,31 @@ const CreateNewsletter = () => {
     
     return (
         <div className='create-newsletter-container'>
-            <div>
-                <h2>Upload your Newsletter</h2>
-            </div>
-            <div {...getRootProps()} className='upload-section'>
-                <input {...getInputProps()} />
-                <img 
-                    src='./upload.png' 
-                    alt="upload" 
-                    width={32}   
-                />
-                <h5>Click to upload</h5>
-            </div>
-            {sendingNewsletter && (<div className='loading-container'>
-                <div className="loader"></div>
-                <div className='loading-text'>sending...</div>
-            </div>)}
-            <div className='submit-newsletter'>
-                <button type='button' onClick={submitNewsletter} className='btn submit-newsletter-btn'>Submit</button>
+            <div className='create-newsletter-body'>
+                <div className='create-newsletter-title'>
+                    <h2>Upload your Newsletter</h2>
+                </div>
+                {newsletterData?.filename && (
+                <div className='file-info'>
+                    <span>{newsletterData.filename}</span>
+                </div>)}
+                <div {...getRootProps()} className='upload-section'>
+                    <input {...getInputProps()} />
+                    <img 
+                        src='./upload.png' 
+                        alt="upload" 
+                        width={32}   
+                    />
+                    <h5>Click to upload</h5>
+                </div>
+                {sendingNewsletter && (
+                <div className='loading-container'>
+                    <div className="loader"></div>
+                    <div className='loading-text'>sending...</div>
+                </div>)}
+                <div className='submit-newsletter'>
+                    <button type='button' onClick={submitNewsletter} className='btn submit-newsletter-btn'>Submit</button>
+                </div>
             </div>
         </div>
     )

@@ -1,22 +1,30 @@
 .create-newsletter-container {
     background-color: rgba(127, 255, 212, 0.158);
     border: 1px solid white;
-    border-radius: 5px;
+    border-radius: var(--border-radius-default);
     width: 67%;
-    height: 32vh;
-    margin: 3rem auto;
+    height: auto;
+    margin-inline: var(--primary-margin);
+    margin-block:  var(--secondary-margin);
 
-    & h2 {
-        margin-block: 1rem;
-    }
+
+}
+
+.create-newsletter-title {
+    margin-block: var(--secondary-margin);
+}
+
+.create-newsletter-body {
+    display:grid;
+    justify-items: center; 
 }
 
 .upload-section {
-
     border: 1px solid white;
-    border-radius: 5px;
+    border-radius: var(--border-radius-default);
     width: 8rem;
     height: auto;
+    margin-bottom: 2rem;
     
     & h5 {
         margin-bottom: 0.5rem;
@@ -28,34 +36,45 @@
 
     & img {
         filter: invert(100%);
+        margin-top: 3px;
     }
 
 }
 
-.submit-newsletter-btn {
-    padding-inline: 10px;
+.file-info {
+    border: 1px solid #109CB3;
+    padding: 5px;
+    border-radius: var(--border-radius-default);
+    margin-bottom: 10px;
 }
 
+.submit-newsletter-btn {
+    padding-inline: 10px;
+    margin-bottom: 3rem;
+}
 
 .loading-container {
     height: 100px;
     position: relative;
     width: 100px;
     border-radius: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
 }
-
 .loading-text {
     color: #ffffff;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: bold;
     margin-top: 45px;
     position: absolute;
     text-align: center;
     text-transform: uppercase;
-    top: -13px;
-    right: 33px;
+    top: 0px;
+    right: 24px;
 }
-
 .loader {
     border: 5px solid #EAF0F6;
     border-radius: 50%;
@@ -65,7 +84,6 @@
     height: 70px;
     animation: spinner 3s linear infinite;
 }
-
 @keyframes spinner {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
