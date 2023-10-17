@@ -2,6 +2,7 @@ import React, {useCallback, useState} from 'react'
 import {useDropzone} from 'react-dropzone'
 import "./CreateNewsletter.css"
 import { postNewsletter } from '../../utils/services';
+import Loader from '../loader/Loader';
 
 const CreateNewsletter = () => {
 
@@ -66,6 +67,7 @@ const CreateNewsletter = () => {
             <div className='create-newsletter-body'>
                 <div className='create-newsletter-title'>
                     <h2>Upload your Newsletter</h2>
+                    <p>Only accept PDF or PNG files</p>
                 </div>
                 {newsletterData?.filename && (
                 <div className='file-info'>
@@ -80,11 +82,7 @@ const CreateNewsletter = () => {
                     />
                     <h5>Click to upload</h5>
                 </div>
-                {sendingNewsletter && (
-                <div className='loading-container'>
-                    <div className="loader"></div>
-                    <div className='loading-text'>sending...</div>
-                </div>)}
+                {sendingNewsletter && (<Loader text={"sending..."}/>)}
                 <div className='submit-newsletter'>
                     <button type='button' onClick={submitNewsletter} className='btn submit-newsletter-btn'>Submit</button>
                 </div>

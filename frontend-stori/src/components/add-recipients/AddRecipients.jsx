@@ -11,7 +11,7 @@ const AddRecipients = () => {
         const emailList = filterAndProcessEmailList();
 
         if (emailList.length === 0){
-            alert("You need to add a valid emails first")
+            alert("You need to add a valid email address first")
             return;
         }
 
@@ -47,7 +47,7 @@ const AddRecipients = () => {
 
                 <div className='add-recipient-title'>
                     <h2>Add one or more recipients</h2>
-                    <p>If you add more than one recipient, just separate with a space.</p>
+                    <p>To add multiple recipients, simply separate their email addresses with spaces.</p>
                 </div>
                 <div className="add-recipient-form">
                     <TextareaAutosize

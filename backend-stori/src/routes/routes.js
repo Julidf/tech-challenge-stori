@@ -12,6 +12,7 @@ const { Appurl } = require("../services/constants");
  * - Body: emailList (an array of email addresses to add as recipients).
  * 
  * Returns:
+ * - Status 200 if the operation is successful.
  * - JSON response with an array of recipients that were successfully added to the database.
  * - Status 500 in case of an error, along with an error message.
  */
@@ -41,7 +42,7 @@ router.post("/add-recipient", async (request, response) => {
             }
         }));
         console.log("Lista de recipients: ", recipientsAdded)
-        response.json(recipientsAdded)
+        response.status(200).json(recipientsAdded)
     } catch (error) {
         console.error(error)
         response.status(500).json({ body: "Error trying to insert a recipient: " + error.message})
