@@ -4,12 +4,13 @@ This project is a tech challenge for Stori where I had to develop a MVP of a New
 ***
 I followed the next requirements: 
 
-1. Admin user can upload a pdf or png image (the newsletter)
-2. Admin user can submit an email list of recipients of the newsletter
-3. Admin user can add a single email to the recipient list
-4. Admin user can click a button to trigger the newsletter submission
-5. PDF of png document should be attached to the email
-6. Recipient users can click a "unsubscribe" link contained in the email, the user should not receive
+1. Admin user can upload a pdf or png image
+2. Email is personalized and using html format
+3. Admin user can submit an email list of recipients of the newsletter
+4. Admin user can add a single email to the recipient list
+5. Admin user can click a button to trigger the newsletter submission
+6. PDF of png document should be attached to the email
+7. Recipient users can click a "unsubscribe" link contained in the email, the user should not receive
 any more emails
 
 ## Table of Contents
