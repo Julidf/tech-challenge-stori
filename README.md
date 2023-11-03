@@ -45,12 +45,12 @@ Make sure you are in the root directory "./tech-challenge-stori".
 
 Command for running the app:
 ```
-docker-compose up
+docker compose up
 ```
 
 Command for stopping the app:
 ```
-docker-compose down
+docker compose down
 ```
 
 ## UI Usage
