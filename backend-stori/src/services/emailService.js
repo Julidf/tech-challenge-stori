@@ -25,33 +25,35 @@ const transporter = nodemailer.createTransport({
  * - A Promise that resolves to an object containing information about the sent email.
  * - An error message in case of an error.
  */
-const sendEmail = async (filename, newsletterDecoded, recipient) => {
+const sendEmail = async (filename, attachment, recipient, html, subject) => {
     try {
-        const html = `
+
+        const htmlFormatted = html.concat(`
             <div style="text-align: center;">
                 <div style="display: inline-block;">
-                    <h3>Enjoy the Newsletter!</h3>
-                    <p>You are receiving a <b>newsletter</b> attached to this email!</p></br>
-                    <p>(Check right upper corner)</p></br>
                     <a href="${Appurl}/unsubscribe/?id=${recipient.id}">Click to unsuscribe<a>
                 </div>
             </div>
-        `
+        `)
 
         //Building the email data
         const mailOptions = {
             from: 'Juli. <jayme.denesik@ethereal.email>',
             to: recipient.email,
-            subject: 'Newsletter of the day!',
-            text: 'You are receiving a Newsletter attached to this email!', //plaintext in case of the html is broken
-            html: html,
-            attachments: [
+            subject: subject,
+            text: 'You are receiving a Newsletter!', //plaintext in case of the html is broken
+            html: htmlFormatted
+        };
+
+        if (attachment) {
+            mailOptions.attachments = [
                 {
                     filename: filename,
-                    content: newsletterDecoded
+                    content: attachment
                 },
-            ],
-        };
+            ]
+        }
+
         const mailInfo = await transporter.sendMail(mailOptions);
         return mailInfo;
     } catch (error) {

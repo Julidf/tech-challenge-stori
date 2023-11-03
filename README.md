@@ -19,10 +19,10 @@ any more emails
 - [API](#api)
 
 ## Technologies
-** For the frontend I use React
-** For the Backend I use Node.js, Express.js and MondoDB with mongoose
-** For sending the email I use NodeMailer and Ethereal (a fake SMTP that provides you with a preview of the fake email you are sending)
-It also works perfectly with Gmail service, but I didn't wanted to use my credentials:
+** For the frontend I used React
+** For the Backend I used Node.js, Express.js and MondoDB with mongoose
+** For sending the email I used NodeMailer and Ethereal (a fake SMTP that provides you with a preview of the fake email you are sending)
+It also works perfectly fine with Gmail service:
 
     // const transporter = nodemailer.createTransport({
     //     host: 'smtp.gmail.com',
@@ -38,19 +38,12 @@ It also works perfectly with Gmail service, but I didn't wanted to use my creden
 
 ## Installation And running
 
-First you will need to enter to the directory for both the backend-stori and the frontend-stori and install de dependencies with "npm install"
-
 The application is running with docker so you will need to have open Docker Desktop.
 Make sure you are in the root directory ../tech-challenge-stori.
 
-Command for running the app.
+Command for running the app:
 ```
 docker-compose up
-```
-
-Command for stopping the app
-```
-docker-compose down
 ```
 
 ## UI Usage

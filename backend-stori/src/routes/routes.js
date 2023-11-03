@@ -2,6 +2,7 @@ const express = require("express");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 const recipientSchema = require("../models/recipient");
+const newsletterSchema = require("../models/newsletter");
 const { validateEmails } = require("../services/middleware");
 const { sendEmail } = require("../services/emailService");
 const { Appurl } = require("../services/constants");
@@ -45,7 +46,7 @@ router.post("/add-recipient", async (request, response) => {
         response.status(200).json(recipientsAdded)
     } catch (error) {
         console.error(error)
-        response.status(500).json({ body: "Error trying to insert a recipient: " + error.message})
+        response.status(500).json({ message: "Error trying to insert a recipient: " + error.message})
     }
 })
 
@@ -61,33 +62,60 @@ router.post("/add-recipient", async (request, response) => {
  */
 router.post("/submit-newsletter", async (request, response) => {
     try {
-        const newsletter = request.body.newsletter;
-        const filename = request.body.filename;
+        const html = request.body.html;
+        const attachment = request.body.attachment.attachment;
+        const filename = request.body.attachment.filename;
+        const subject = request.body.subject;
 
-        if(!newsletter) {
-            throw new Error("There isn't a newsletter to send")
+        if(!html) {
+            return response.status(500).json({ message: "There isn't HTML to send!: " + error.message });
+        }
+        if(!subject) {
+            throw new Error("There isn't a subject to send")
         }
 
-        const newsletterDecoded = Buffer.from(newsletter.split(',')[1], 'base64'); //Decoding the base64 encoded file
-
         //fetching the recipients list
-        const recipientList = await getAllRecipients();
-        
+        const recipientList = await getAllRecipientsSubscribed();
         if (recipientList.length <= 0) {
             throw new Error("There aren't recipients to send the email")
         }
 
+        //Decoding the base64 encoded file
+        let attachmentDecoded;
+        let fileAttachment;
+        if (attachment) {
+            attachmentDecoded = Buffer.from(attachment.split(',')[1], 'base64'); 
+            // fileAttachment = fs.writeFileSync(filename, attachmentDecoded);
+        }
+
+        addNewsletter(html, subject, recipientList);
+
         //sending the email for each recipient on the recipient list
-        const mailInfoArray = await Promise.all(recipientList.map(async (recipient, index) => {
-            return await sendEmail(filename, newsletterDecoded, recipient);
-        }));
+        const mailInfoArray = await Promise.all(
+            recipientList.map(async (recipient) => {
+                return await sendEmail(filename, attachmentDecoded, recipient, html, subject);
+            }
+        ));
           
         response.status(200).json({ body: nodemailer.getTestMessageUrl(mailInfoArray[0])}); //returning a preview of the first email sended.
     } catch (error) {
         console.error("ERROR!", error.message)
-        response.status(500).json({ body: "Error submiting the newsletter: " + error.message });
+        return response.status(500).json({ message: "Error submiting the newsletter: " + error.message });
     }
 })
+
+const addNewsletter = async (body, subject, recipientList) => {
+    try {
+        const recipientEmails = recipientList.map((recipient) => {
+            return recipient.email;
+        })
+        const sentAt = new Date().toISOString();
+        const newsletter = new newsletterSchema({ body:body, subject:subject, recipientList:recipientEmails, sentAt:sentAt });
+        await newsletter.save();
+    } catch (error) {
+        throw new Error(error.message)
+    }
+}
 
 /* Endpoint to display an unsubscribe confirmation page.
  * 
@@ -101,11 +129,12 @@ router.post("/submit-newsletter", async (request, response) => {
 router.get("/unsubscribe", async (request, response) => {
     try {
         const id = request.query.id;
+
         const html = `
             <div style="text-align: center;">
                 <div style="display: inline-block;">
                     <h1>Do you really want to unsubscribe?</h1>
-                    <button><a href="${Appurl}/confirm-unsubscribe/?id=${id}">Click to unsubscribe</a></button>
+                    <button><a id="unsubscribeLink" href="${Appurl}/confirm-unsubscribe/?id=${id}">Click to unsubscribe</a></button>
                 </div>
             </div>
         `;
@@ -113,7 +142,7 @@ router.get("/unsubscribe", async (request, response) => {
         response.send(html);
     } catch (error) {
         console.error(error)
-        response.status(500).json({ body: "Error trying to unsubscribe: " + error.message})
+        response.status(500).json({ message: "Error trying to unsubscribe: " + error.message})
     }
 })
 
@@ -136,21 +165,38 @@ router.get("/confirm-unsubscribe", async (request, response) => {
     `;
     try {
         const id = request.query.id;
+
         console.log(id)
-        recipientSchema.deleteOne({ _id: id }).then(() => {
+
+        const unsubscribedAt = new Date().toISOString();
+        recipientSchema.updateOne(
+            { _id: id }, 
+            { $set: { unsubscribedAt: unsubscribedAt } }
+        ).then(() => {
             response.send(html);
         })
     } catch (error) {
         console.error(error)
-        response.status(500).json({ body: "Error confirming unsubscribing: " + error.message})
+        response.status(500).json({ message: "Error confirming unsubscribing: " + error.message})
     }
 })
+
+// Fetching all the recipients from the Database who are currently subscribed to the Newsletter.
+const getAllRecipientsSubscribed = async () => {
+    try {
+        const recipients = await recipientSchema.find({ unsubscribedAt: null });
+        console.log("Fetching the subscribed recipients list..." + recipients)
+        return recipients;
+    } catch (error) {
+        throw new Error("Error trying to retrieve subscribed recipients: " + error.message)
+    }
+}
 
 // Fetching all the recipients from the Database
 const getAllRecipients = async () => {
     try {
         const recipients = await recipientSchema.find();
-        console.log("Fetching the recipients list...")
+        console.log("Fetching the recipients list..." + recipients)
         return recipients;
     } catch (error) {
         throw new Error("Error trying to retrieve recipients: " + error.message)
@@ -162,5 +208,11 @@ router.get("/", async (request, response) => {
     const recipients = await getAllRecipients();
     response.send(recipients);
 })
+
+router.get("/newsletter", async (request, response) => {
+    const newsletter = await newsletterSchema.find();
+    response.send(newsletter);
+})
+
 
 module.exports = router;

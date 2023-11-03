@@ -23,26 +23,57 @@ body {
   --border-radius-default: 5px;
 }
 
-.App {
-  text-align: center;
-}
-
-.landing-container {
-  display: grid;
-  justify-items: center;
-  justify-content: center;
-}
-
 /* #109CB3 */
 
 .btn {
-  border-radius: var(--border-radius-default);
+  border-radius: 8px;
   border: 1px solid white;
-  padding: 3px;
+  min-width: 70px;
+  padding: 6px 10px;
+  font-size: 15px;
   background-color: rgba(66, 129, 108, 0.5);
   color: white;
 
   &:hover {
-    cursor: pointer
+    cursor: pointer;
   }
+}
+
+span {
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+textarea {
+  border-radius: var(--border-radius-default);
+  border: 1px solid white;
+  color: white;
+  background-color: rgba(17, 31, 25, 0.5);
+  padding: 8px;
+  margin-bottom: var(--secondary-margin);
+  min-width: 10rem;
+  resize: none;
+  width: 30vw;
+  height: 30vw;
+}
+
+textarea:focus {
+  outline-color: white;
+}
+
+textarea::-webkit-scrollbar {
+  width: 10px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: var(--border-radius-default);
+}
+
+a {
+  color: #1E88E5;
+  text-decoration:none;
+}
+a:hover {
+  color: rgb(149, 205, 255)
 }

@@ -6,8 +6,6 @@
     height: auto;
     margin-inline: var(--primary-margin);
     margin-block:  var(--secondary-margin);
-
-
 }
 
 .create-newsletter-title {
@@ -21,6 +19,37 @@
 .create-newsletter-body {
     display:grid;
     justify-items: center; 
+    margin: 20px;
+}
+
+.create-newssletter-form {
+    display: grid;
+
+    & input {
+        border-radius: var(--border-radius-default);
+        border: 1px solid white;
+        color: white;
+        background-color: rgba(17, 31, 25, 0.5);
+        padding: 8px;
+        margin-bottom: var(--secondary-margin);
+        min-width: 10rem;
+        resize: none;
+        width: 30vw;
+    }
+
+    & input:focus {
+        outline-color: white;
+    }
+
+}
+
+.create-newssletter-form select {
+    margin-block: 1rem;
+    border-radius: var(--border-radius-default);
+    color: white;
+    padding: 4px;
+    background-color: rgba(17, 31, 25, 0.5);
+
 }
 
 .upload-section {
@@ -42,7 +71,15 @@
         filter: invert(100%);
         margin-top: 3px;
     }
+}
 
+.create-newsletter-attachment {
+    display: grid;
+    justify-items: center; 
+
+    & h2 {
+        margin-bottom: 10px;
+    }
 }
 
 .file-info {
@@ -52,7 +89,7 @@
     margin-bottom: 10px;
 }
 
-.submit-newsletter-btn {
+.submit-newsletter--btn {
     padding-inline: 10px;
     margin-bottom: 3rem;
 }

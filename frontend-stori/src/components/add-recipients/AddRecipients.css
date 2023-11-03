@@ -9,6 +9,10 @@
     margin-block:  var(--secondary-margin);
 }
 
+.add-recipient-body {
+    margin: 5px;
+}
+
 .add-recipient-title {
     margin-block: var(--secondary-margin);
 
@@ -29,31 +33,5 @@
 .add-recipient-form {
     display: grid;
     justify-items: center; 
-    
-    & textarea {
-        border-radius: var(--border-radius-default);
-        border: 1px solid white;
-        color: white;
-        background: none;
-        padding: 8px;
-        margin-bottom: var(--secondary-margin);
-        min-width: 10rem;
-        resize: none;
-
-        width: 30vw;
-        height: 30vw;
-    }
-
-    & textarea:focus {
-        outline-color: white;
-    }
 }
 
-textarea::-webkit-scrollbar {
-    width: 10px;
-}
-  
-textarea::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: var(--border-radius-default);
-}

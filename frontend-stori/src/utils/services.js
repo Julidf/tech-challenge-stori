@@ -26,8 +26,8 @@ export const postNewsletter = async function (body) {
         console.log(response)
         return response.data;
     } catch (error) {
-        console.log(error)
-        throw new Error(error)
+        console.log(error.response.data.message)
+        throw new Error(error.response.data.message)
     }
 }
 

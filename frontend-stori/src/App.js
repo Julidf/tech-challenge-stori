@@ -1,16 +1,15 @@
 import './App.css';
-import AddRecipient from './components/add-recipients/AddRecipients';
-import CreateNewsletter from './components/create-newsletter/CreateNewsletter';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Home from './views/Home';
 
 function App() {
 
   return (
-    <div className="App">
-      <div className='landing-container'>
-        <AddRecipient />
-        <CreateNewsletter />
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' Component={Home}/>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -10,7 +10,7 @@ const app = express();
 const mongoURI = process.env.MONGO_URI;
 
 app.use(cors());
-app.use(bodyParser.json({limit: '10mb'})) //configuration for express to analize data in JSON format with a max of 10mb (allowing 10mb for files)
+app.use(bodyParser.json({limit: '1mb'})) //configuration for express to analize data in JSON format with a max of 10mb (allowing 10mb for files)
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(router);

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import './AddRecipients.css';
 import { addRecipient } from '../../utils/services';
 import TextareaAutosize from 'react-textarea-autosize';
+import Button from "../button/Button";
 
 const AddRecipients = () => {
 
@@ -47,9 +48,9 @@ const AddRecipients = () => {
 
                 <div className='add-recipient-title'>
                     <h2>Add one or more recipients</h2>
-                    <p>To add multiple recipients, simply separate their email addresses with spaces.</p>
                 </div>
                 <div className="add-recipient-form">
+                    <span>To add multiple recipients separate the email addresses with spaces.</span>
                     <TextareaAutosize
                         id="email"
                         type="email"
@@ -59,9 +60,7 @@ const AddRecipients = () => {
                         minRows={1}
                         maxRows={30}
                     />
-                    <button type="button" onClick={handleEmailSubmit} className="btn add-recipient-button" disabled={!email}>
-                        Add
-                    </button>
+                    <Button text={"Add"} handleSubmit={handleEmailSubmit} disableReason={!email} />                    
                 </div>
             </div>
         </div>
