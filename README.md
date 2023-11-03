@@ -36,14 +36,21 @@ It also works perfectly fine with Gmail service:
     //     }
     // });
 
-## Installation And running
+## Installation And Running
+
+First you will need to enter to the directory for both the /backend-stori and the /frontend-stori and install de dependencies with "npm install" command.
 
 The application is running with docker so you will need to have open Docker Desktop.
-Make sure you are in the root directory ../tech-challenge-stori.
+Make sure you are in the root directory "./tech-challenge-stori".
 
 Command for running the app:
 ```
 docker-compose up
+```
+
+Command for stopping the app:
+```
+docker-compose down
 ```
 
 ## UI Usage
