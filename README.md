@@ -1,6 +1,5 @@
 Tech challenge. Newsletter sending application.
 
-
 ***
 I followed the next requirements: 
 
