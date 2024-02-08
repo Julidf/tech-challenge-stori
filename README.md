@@ -1,6 +1,6 @@
-# tech-challenge-stori
+Tech challenge. Newsletter sending application.
 
-This project is a tech challenge for Stori where I had to develop a MVP of a Newsletter sending application.
+
 ***
 I followed the next requirements: 
 
